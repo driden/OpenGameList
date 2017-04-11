@@ -1,4 +1,5 @@
 ﻿(function (global) {
+    
     var map = {
         'app': 'app',
         '@angular': 'js/@angular',
