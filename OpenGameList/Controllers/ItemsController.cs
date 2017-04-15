@@ -11,15 +11,54 @@ namespace OpenGameList.Controllers
     public class ItemsController : Controller
     {
         #region Attribute based routes
-        
+
+        #region RESTful Conventions
+
+        /// <summary>
+        /// GET: api/items
+        /// </summary>
+        /// <returns>Nothing: this method will raise a HttpNotFound HTTP exception since
+        /// we're not supporting this API call.</returns>
+        [HttpGet()]
+        public IActionResult Get()
+        {
+            return NotFound(new { Error = "not found" });
+        }
+
+        /// <summary>
+        /// GET: api/items/{id}
+        /// ROUTING TYPE: attribute-based
+        /// </summary>
+        /// <param name="id">id of the item to get</param>
+        /// <returns>A Json-serialized object representing a single item.</returns>
+        [HttpGet("{id}")]
+        public IActionResult Get(int id)
+        {
+            return new JsonResult(GetSampleItems().FirstOrDefault(i => i.Id == id), DefaultJsonSettings);
+        }
+
+        #endregion
+
+        /// <summary>
+        /// GET api/items/GetLatest
+        /// ROUTING TYPE: attribute-based
+        /// </summary>        
+        /// <returns>An array of a default number of Json-serialized objects representing the last inserted items.</returns>
+        [HttpGet("GetLatest")]
+        public IActionResult GetLatest()
+        {
+            return GetLatest(DefaultNumberOfItems);
+        }
+
         /// <summary>
         /// GET api/items/GetLatest/5
         /// </summary>
         /// <param name="num">Amount of latest items to fetch</param>
-        /// <returns></returns>
+        /// <returns>An array of a default number of Json-serialized objects representing the last inserted items.</returns>
         [HttpGet("GetLatest/{num}")]
         public IActionResult GetLatest(int num)
         {
+            if ( num > DefaultNumberOfItems ) num = DefaultNumberOfItems;
             var items = GetSampleItems().OrderByDescending(x => x.CreatedDate).Take(num);
             return new JsonResult(items, DefaultJsonSettings);
         }
@@ -32,6 +71,7 @@ namespace OpenGameList.Controllers
         [HttpGet("api/items/GetMostViewed/{num}")]
         public IActionResult GetMostViewed(int num)
         {
+            if ( num > DefaultNumberOfItems ) num = DefaultNumberOfItems;
             var mostViewed = GetSampleItems().OrderByDescending(x => x.ViewCount).Take(num);
             return new JsonResult(mostViewed, DefaultJsonSettings);
         }
@@ -39,6 +79,7 @@ namespace OpenGameList.Controllers
         [HttpGet("api/items/GetRandom/{num}")]
         public IActionResult GetRandom(int num)
         {
+            if ( num > DefaultNumberOfItems ) num = DefaultNumberOfItems;
             var rnd = GetSampleItems().OrderBy(x => Guid.NewGuid()).Take(num);
             return new JsonResult(rnd, DefaultJsonSettings);
         }
@@ -79,6 +120,18 @@ namespace OpenGameList.Controllers
         {
             get { return new JsonSerializerSettings() { Formatting = Formatting.Indented }; }
         }
+
+        /// <summary>
+        /// Returns the default number of items to retrieve when using parameterless
+        /// overloads of the API methods retrieving item lists.
+        /// </summary>
+        private int DefaultNumberOfItems { get { return 5; } }
+
+        /// <summary>
+        /// Returns the maximum number of items to retrieve when using
+        /// the API methods retrieving item lists.
+        /// </summary>
+        private int MaxNumberOfItems { get { return 100; } }
         #endregion
     }
 }

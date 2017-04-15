@@ -6,11 +6,16 @@ import { HttpModule } from "@angular/http";
 import "rxjs/Rx";
 
 import { AppComponent } from "./app.component";
+import { ItemListComponent } from "./item-list.component";
+import { ItemService } from "./item.service";
 
 @NgModule({
-    declarations: [AppComponent],
+    declarations: [
+        AppComponent,
+        ItemListComponent
+    ],
     imports: [BrowserModule, HttpModule],
-    providers: [],
+    providers: [ItemService],
     bootstrap: [AppComponent]
 })
 
