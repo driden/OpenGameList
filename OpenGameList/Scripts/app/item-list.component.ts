@@ -1,16 +1,17 @@
-﻿import { Component, OnInit } from "@angular/core";
+﻿import { Component, Input, OnInit } from "@angular/core";
 import { Item } from "./item";
 import { ItemService } from "./item.service";
 
 @Component({
     selector: "item-list",
-    template: `<h2>Latest Items:</h2>
+    template: `<h2>{{title}}:</h2>
                <ul class="items">
                     <li *ngFor="let item of items"
 	                [class.selected]="item===selectedItem"
 	                (click)="onSelect(item)">
 	                <span>{{item.Title}}</span>
-                </ul>`,
+                </ul>
+                <item-detail *ngIf="selectedItem" [item]="selectedItem"></item-detail>`,
     styles: [`
         ul.items li {
             cursor: pointer;
@@ -22,6 +23,8 @@ import { ItemService } from "./item.service";
 })
 
 export class ItemListComponent implements OnInit {
+    @Input() class: string;
+    title: string;
     selectedItem: Item;
     items: Item[];
     errorMessage: string;
@@ -29,7 +32,30 @@ export class ItemListComponent implements OnInit {
     constructor(private itemService: ItemService) { }
 
     ngOnInit() {
-        this.getLatest();    
+        console.log("ItemListComponent instantiated with type " + this.class);
+        var s = null;
+        switch (this.class) {
+
+            case "most-viewed":
+                this.title = "Most Viewed Items";
+                s = this.itemService.getMostViewed();
+                break;
+
+            case "random":
+                this.title = "Random Items";
+                s = this.itemService.getRandom();
+                break;
+
+            case "latest":
+            default:
+                this.title = "Latest Items";
+                s = this.itemService.getLatest();
+        }
+
+        s.subscribe(
+            items => this.items = items,
+            error => this.errorMessage = <any>error
+        );
     }
 
     getLatest() {

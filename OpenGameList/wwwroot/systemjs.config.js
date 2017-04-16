@@ -18,7 +18,9 @@
         'http',
         'platform-browser',
         'platform-browser-dynamic',
-        'upgrade'
+        'upgrade',
+        'forms',
+        'router'
     ];
 
     function packIndex(pkgName) {

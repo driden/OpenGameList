@@ -54,7 +54,7 @@ namespace OpenGameList.Controllers
         /// GET api/items/GetLatest/5
         /// </summary>
         /// <param name="num">Amount of latest items to fetch</param>
-        /// <returns>An array of a default number of Json-serialized objects representing the last inserted items.</returns>
+        /// <returns>An array of {num} a default number of Json-serialized objects representing the last inserted items.</returns>
         [HttpGet("GetLatest/{num}")]
         public IActionResult GetLatest(int num)
         {
@@ -64,11 +64,11 @@ namespace OpenGameList.Controllers
         }
 
         /// <summary>
-        /// GET: api/items/GetMosViewed/{num}
+        /// GET: api/items/GetMosViewed
         /// </summary>
         /// <param name="num"></param>
-        /// <returns>An array of {num} Json-serialized objects representing the items with the most views</returns>        
-        [HttpGet("api/items/GetMostViewed/{num}")]
+        /// <returns>An array of DefaultNumberOfItems Json-serialized objects representing the items with the most views</returns>        
+        [HttpGet("GetMostViewed/{num}")]
         public IActionResult GetMostViewed(int num)
         {
             if ( num > DefaultNumberOfItems ) num = DefaultNumberOfItems;
@@ -76,13 +76,40 @@ namespace OpenGameList.Controllers
             return new JsonResult(mostViewed, DefaultJsonSettings);
         }
 
-        [HttpGet("api/items/GetRandom/{num}")]
+        /// <summary>
+        /// GET: api/items/GetMosViewed/{num}
+        /// </summary>
+        /// <param name="num"></param>
+        /// <returns>An array of DefaultNumberOfItems of Json-serialized objects representing the items with the most views</returns>        
+        [HttpGet("GetMostViewed")]
+        public IActionResult GetMostViewed()
+        {
+            return GetMostViewed(DefaultNumberOfItems);
+        }
+
+        /// <summary>
+        /// GET: GetRandom/{num}
+        /// </summary>
+        /// <param name="num">amount of records to fetch</param>
+        /// <returns>An array of DefaultNumberOfItems Json-serialized objects representing random selected items</returns>
+        [HttpGet("GetRandom")]
+        public IActionResult GetRandom()
+        {
+            return GetRandom(DefaultNumberOfItems);
+        }
+
+        /// <summary>
+        /// GET: GetRandom/{num}
+        /// </summary>
+        /// <param name="num">amount of records to fetch</param>
+        /// <returns>An array of <paramref name="num"/> Json-serialized objects representing random selected items</returns>
+        [HttpGet("GetRandom/{num}")]
         public IActionResult GetRandom(int num)
         {
             if ( num > DefaultNumberOfItems ) num = DefaultNumberOfItems;
             var rnd = GetSampleItems().OrderBy(x => Guid.NewGuid()).Take(num);
             return new JsonResult(rnd, DefaultJsonSettings);
-        }
+        }        
         #endregion
 
         #region Private Methods

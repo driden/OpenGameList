@@ -26,7 +26,23 @@ System.register(["@angular/core", "./item.service"], function (exports_1, contex
                     this.itemService = itemService;
                 }
                 ngOnInit() {
-                    this.getLatest();
+                    console.log("ItemListComponent instantiated with type " + this.class);
+                    var s = null;
+                    switch (this.class) {
+                        case "most-viewed":
+                            this.title = "Most Viewed Items";
+                            s = this.itemService.getMostViewed();
+                            break;
+                        case "random":
+                            this.title = "Random Items";
+                            s = this.itemService.getRandom();
+                            break;
+                        case "latest":
+                        default:
+                            this.title = "Latest Items";
+                            s = this.itemService.getLatest();
+                    }
+                    s.subscribe(items => this.items = items, error => this.errorMessage = error);
                 }
                 getLatest() {
                     this.itemService.getLatest()
@@ -37,16 +53,21 @@ System.register(["@angular/core", "./item.service"], function (exports_1, contex
                     console.log("item with id " + this.selectedItem.Id + " has been selected.");
                 }
             };
+            __decorate([
+                core_1.Input(),
+                __metadata("design:type", String)
+            ], ItemListComponent.prototype, "class", void 0);
             ItemListComponent = __decorate([
                 core_1.Component({
                     selector: "item-list",
-                    template: `<h2>Latest Items:</h2>
+                    template: `<h2>{{title}}:</h2>
                <ul class="items">
                     <li *ngFor="let item of items"
 	                [class.selected]="item===selectedItem"
 	                (click)="onSelect(item)">
 	                <span>{{item.Title}}</span>
-                </ul>`,
+                </ul>
+                <item-detail *ngIf="selectedItem" [item]="selectedItem"></item-detail>`,
                     styles: [`
         ul.items li {
             cursor: pointer;
