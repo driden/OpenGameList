@@ -7,7 +7,7 @@ System.register(["@angular/core"], function (exports_1, context_1) {
         return c > 3 && r && Object.defineProperty(target, key, r), r;
     };
     var __moduleName = context_1 && context_1.id;
-    var core_1, AppComponent;
+    var core_1, AboutComponent;
     return {
         setters: [
             function (core_1_1) {
@@ -15,26 +15,23 @@ System.register(["@angular/core"], function (exports_1, context_1) {
             }
         ],
         execute: function () {
-            AppComponent = class AppComponent {
+            AboutComponent = class AboutComponent {
                 constructor() {
-                    this.title = "OpenGameList";
+                    this.title = "About";
                 }
             };
-            AppComponent = __decorate([
+            AboutComponent = __decorate([
                 core_1.Component({
-                    selector: "opengamelist",
-                    template: `<h1>{{title}}</h1>
-                <div class="menu">
-                    <a class="home" [routerLink]="['']">Home</a>
-                    | <a class="about" [routerLink]="['about']">About</a>
-                    | <a class="login" [routerLink]="['login']">Login</a>
-                </div>
-                <router-outlet></router-outlet>
+                    selector: "about",
+                    template: `<h2>{{title}}</h2>
+                <div>
+                    OpenGameList: a production-ready. fully-featured SPA sample powered by ASP.NET Core Web API and Angular 2.
+                </div>                
                 `
                 })
-            ], AppComponent);
-            exports_1("AppComponent", AppComponent);
+            ], AboutComponent);
+            exports_1("AboutComponent", AboutComponent);
         }
     };
 });
-//# sourceMappingURL=app.component.js.map
+//# sourceMappingURL=about.component.js.map

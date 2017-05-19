@@ -35,5 +35,10 @@
   <ItemGroup>
     <Folder Include="Controllers\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Scripts\app\login.component.js">
+      <DependentUpon>login.component.ts</DependentUpon>
+    </None>
+  </ItemGroup>
 
 </Project>

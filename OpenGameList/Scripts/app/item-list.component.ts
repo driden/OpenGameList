@@ -1,17 +1,18 @@
 ﻿import { Component, Input, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
 import { Item } from "./item";
 import { ItemService } from "./item.service";
 
 @Component({
     selector: "item-list",
-    template: `<h2>{{title}}:</h2>
+    template: `<h2>{{title}}</h2>
                <ul class="items">
                     <li *ngFor="let item of items"
-	                [class.selected]="item===selectedItem"
-	                (click)="onSelect(item)">
-	                <span>{{item.Title}}</span>
-                </ul>
-                <item-detail *ngIf="selectedItem" [item]="selectedItem"></item-detail>`,
+	                    [class.selected]="item===selectedItem"
+	                    (click)="onSelect(item)">
+	                    <span>{{item.Title}}</span>
+                    </li>
+                </ul>`,                
     styles: [`
         ul.items li {
             cursor: pointer;
@@ -29,7 +30,7 @@ export class ItemListComponent implements OnInit {
     items: Item[];
     errorMessage: string;
 
-    constructor(private itemService: ItemService) { }
+    constructor(private itemService: ItemService, private router: Router) { }
 
     ngOnInit() {
         console.log("ItemListComponent instantiated with type " + this.class);
@@ -66,6 +67,8 @@ export class ItemListComponent implements OnInit {
 
     onSelect(item: Item) {
         this.selectedItem = item;
-        console.log("item with id " + this.selectedItem.Id + " has been selected.");
+        console.log("item with id " + this.selectedItem.Id + " has been clicked: loading ItemDetailComponent");
+
+        this.router.navigate(["item", this.selectedItem.Id]);
     }
 }

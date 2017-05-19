@@ -1,5 +1,7 @@
-﻿import { Component, Input } from "@angular/core";
+﻿import { Component, OnInit } from "@angular/core";
 import { Item } from "./item";
+import { ItemService } from "./item.service";
+import { Router, ActivatedRoute } from "@angular/router";
 
 @Component({
     selector: "item-detail",
@@ -36,5 +38,27 @@ import { Item } from "./item";
 })
 
 export class ItemDetailComponent {
-    @Input("item") item: Item;
+    item: Item;
+
+    constructor(
+        private itemService: ItemService,
+        private router :  Router,
+        private activatedRoute: ActivatedRoute) { }
+
+    ngOnInit() {
+        console.log("sacando id del params");
+
+        var id = +this.activatedRoute.snapshot.params["id"];
+
+        console.log("Id de la lista " + id);
+
+        if (id) {
+            this.itemService.get(id).subscribe(i => this.item = i);
+            console.log(this.item);
+        } else {
+            console.log("Invalid id: routing back to home...");
+            this.router.navigate([""]);
+        }
+    }
+
 }
