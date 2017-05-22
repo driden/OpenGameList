@@ -262,6 +262,8 @@ __pycache__/
 OpenGameList/typings/*
 OpenGameListWebApp/OpenGameList/node_modules/*
 
+OpenGameList/Scripts/app/*.js
 
 OpenGameList/wwwroot/app
 OpenGameList/wwwroot/js
+OpenGameList/Scripts/app/*.js
