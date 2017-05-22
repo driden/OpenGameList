@@ -24,8 +24,8 @@ var srcPaths = {
 var destPaths = {
     app: 'wwwroot/app/',
     js: 'wwwroot/js/',
-    js_angular: 'wwwroot/js/@angular',
-    js_rxjs: 'wwwroot/js/rxjs'
+    js_angular: 'wwwroot/js/@angular/',
+    js_rxjs: 'wwwroot/js/rxjs/'
 };
 
 // Compile, minify and create sourcemaps all Typescript files and place them to 
@@ -34,7 +34,7 @@ gulp.task('app',['app_clean'], function () {
     return gulp.src(srcPaths.app)
         .pipe(gp_sourcemaps.init())
         .pipe(gp_typescript(require('./tsconfig.json').compilerOptions))
-        .pipe(gp_uglify({ mangle: false }))
+        //.pipe(gp_uglify({ mangle: false }))
         .pipe(gp_sourcemaps.write('/'))
         .pipe(gulp.dest(destPaths.app));
 });
