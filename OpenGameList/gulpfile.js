@@ -52,8 +52,8 @@ gulp.task('js', function () {
     gulp.src(srcPaths.js_rxjs)
         .pipe(gulp.dest(destPaths.js_rxjs));
     return gulp.src(srcPaths.js)
-        // .pipe(gp_uglify({ mangle: false })) // Disable Uglify
-        // .pipe(gp_concat('all-js.min.js')) // Disable Concat
+        .pipe(gp_uglify({ mangle: false })) // Disable Uglify
+        .pipe(gp_concat('all-js.min.js')) // Disable Concat
         .pipe(gulp.dest(destPaths.js));
 });
 
