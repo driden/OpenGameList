@@ -4,7 +4,8 @@ var gulp = require('gulp'),
     gp_concat = require('gulp-concat'),
     gp_sourcemaps = require("gulp-sourcemaps"),
     gp_typescript = require("gulp-typescript"),
-    gp_uglify = require("gulp-uglify");
+    gp_uglify = require("gulp-uglify"),
+    babel = require("gulp-babel");
 
 // Paths
 var srcPaths = {
@@ -34,7 +35,11 @@ gulp.task('app',['app_clean'], function () {
     return gulp.src(srcPaths.app)
         .pipe(gp_sourcemaps.init())
         .pipe(gp_typescript(require('./tsconfig.json').compilerOptions))
+
+        //.pipe(babel({ presets: ['es2015'] }))
+
         //.pipe(gp_uglify({ mangle: false }))
+        
         .pipe(gp_sourcemaps.write('/'))
         .pipe(gulp.dest(destPaths.app));
 });
@@ -53,7 +58,7 @@ gulp.task('js', function () {
         .pipe(gulp.dest(destPaths.js_rxjs));
     return gulp.src(srcPaths.js)
         .pipe(gp_uglify({ mangle: false })) // Disable Uglify
-        .pipe(gp_concat('all-js.min.js')) // Disable Concat
+       // .pipe(gp_concat('all-js.min.js')) // Disable Concat
         .pipe(gulp.dest(destPaths.js));
 });
 
