@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OpenGameList.Data.Comments;
+using OpenGameList.Data.Items;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -42,6 +44,19 @@ namespace OpenGameList.Data.Users
         [Required]
         public DateTime LastModifiedDate { get; set; }
 
+        #endregion
+
+        #region Related Properties
+
+        /// <summary>
+        /// A list of items wrote by this user: this property will be loaded on first use using EF's lazy-loading feature
+        /// </summary>
+        public virtual List<Item> Items { get; set; }
+
+        /// <summary>
+        /// A list of comments wrote by this user: this property will be loaded on first use using EF's lazy-loading feature
+        /// </summary>
+        public List<Comment> Comments { get; set; }
         #endregion
     }
 }
