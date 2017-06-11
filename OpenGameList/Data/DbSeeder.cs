@@ -1,12 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OpenGameList.Data.Users;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using OpenGameList.Data.Items;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using OpenGameList.Data.Comments;
+using OpenGameList.Data.Items;
+using OpenGameList.Data.Users;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace OpenGameList.Data
 {
