@@ -1,4 +1,4 @@
-System.register(["@angular/core", "./item.service", "@angular/router"], function (exports_1, context_1) {
+System.register(["@angular/core", "./item", "./item.service", "@angular/router"], function (exports_1, context_1) {
     "use strict";
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -10,11 +10,14 @@ System.register(["@angular/core", "./item.service", "@angular/router"], function
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
     var __moduleName = context_1 && context_1.id;
-    var core_1, item_service_1, router_1, ItemDetailComponent;
+    var core_1, item_1, item_service_1, router_1, ItemDetailComponent;
     return {
         setters: [
             function (core_1_1) {
                 core_1 = core_1_1;
+            },
+            function (item_1_1) {
+                item_1 = item_1_1;
             },
             function (item_service_1_1) {
                 item_service_1 = item_service_1_1;
@@ -36,13 +39,38 @@ System.register(["@angular/core", "./item.service", "@angular/router"], function
                     console.log("Id de la lista " + id);
                     if (id) {
                         this.itemService.get(id).subscribe(i => this.item = i);
-                        console.log(this.item);
+                    }
+                    else if (id == 0) {
+                        console.log("id is 0; adding new item...");
+                        this.item = new item_1.Item(0, "New Item", null);
                     }
                     else {
                         console.log("Invalid id: routing back to home...");
                         this.router.navigate([""]);
                     }
                 }
+                onInsert(item) {
+                    this.itemService.add(item).subscribe((data) => {
+                        this.item = data;
+                        console.log("Item " + this.item.Id + " has been added.");
+                        this.router.navigate([""]);
+                    }, (error) => console.log(error));
+                }
+                onUpdate(item) {
+                    this.itemService.update(item).subscribe((data) => {
+                        this.item = data;
+                        console.log("Item " + this.item.Id + " has been updated.");
+                        this.router.navigate([""]);
+                    }, (error) => console.log(error));
+                }
+                onDelete(item) {
+                    var id = item.Id;
+                    this.itemService.delete(id).subscribe((data) => {
+                        console.log("Item " + this.item.Id + " has been deleted.");
+                        this.router.navigate([""]);
+                    }, (error) => console.log(error));
+                }
+                onBack() { this.router.navigate([""]); }
             };
             ItemDetailComponent = __decorate([
                 core_1.Component({
@@ -60,6 +88,15 @@ System.register(["@angular/core", "./item.service", "@angular/router"], function
                     <textarea [(ngModel)]="item.Description" placeholder ="Insert a suitable description..."></textarea>
                 </li>
             </ul>
+            <div *ngIf="item.Id == 0" class="commands insert">
+                <input type="button" value="Save" (click)="onInsert(item)"/>
+                <input type="button" value="Cancel" (click)="onBack()"/>
+            </div>
+            <div *ngIf="item.Id != 0" class="commands update">
+                <input type="button" value="Update" (click)="onUpdate(item)"/>
+                <input type="button" value="Delete" (click)="onDelete(item)"/>
+                <input type="button" value="Back" (click)="onBack()"/>
+            </div>
         </div>`,
                     styles: [`
         .item-details {

@@ -1,5 +1,5 @@
 ﻿import { Injectable } from "@angular/core";
-import { Http, Response } from "@angular/http";
+import { Http, Response, Headers, RequestOptions } from "@angular/http";
 import { Observable } from "rxjs/Observable";
 import { Item } from "./item";
 
@@ -47,6 +47,38 @@ export class ItemService {
         return this.http.get(url)
             .map(res => <Item>res.json())
             .catch(this.handleError);
+    }
+
+    // calls the [POST] /api/items/ Web API method to add a new item.
+    add(item: Item) {
+        var url = this.baseUrl;
+        return this.http.post(url, JSON.stringify(item),
+            this.getRequestOptions())
+            .map(response => response.json())
+            .catch(this.handleError);
+    }
+
+    // calls the [PUT] /api/items/{id} Web API method to update an existing Item
+    update(item: Item) {
+        var url = this.baseUrl + item.Id;
+        return this.http.put(url, JSON.stringify(item),
+            this.getRequestOptions())
+            .map(response => response.json())
+            .catch(this.handleError);
+    }
+
+    //calls the [DELETE] /api/items/{id} Web API method to delete the item with the given id
+    delete(id: number) {
+        var url = this.baseUrl + id;
+        return this.http.delete(url)
+            .catch(this.handleError);
+    }
+
+    // returns a viable RequestOptions object to handle Json requests
+    private getRequestOptions() {
+        return new RequestOptions({
+            headers: new Headers({"Content-Type":"application/json"})
+        });
     }
 
     private handleError(error: Response) {

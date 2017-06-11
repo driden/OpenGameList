@@ -31,8 +31,6 @@ namespace OpenGameList.Controllers
 
         #region Attribute based routes
 
-        #region RESTful Conventions
-
         /// <summary>
         /// GET: api/items
         /// </summary>
@@ -54,10 +52,107 @@ namespace OpenGameList.Controllers
         public IActionResult Get(int id)
         {
             var item = DbContext.Items.FirstOrDefault(i => i.Id == id);
-            return new JsonResult(TinyMapper.Map<ItemViewModel>(item), DefaultJsonSettings);
+            if (item != null)
+                return new JsonResult(TinyMapper.Map<ItemViewModel>(item), DefaultJsonSettings);
+            else
+                return NotFound(new { Error = $"Item ID {id} has not been found." });
         }
 
-        #endregion
+        #region CRUD Operations
+        /// <summary>
+        /// POST: api/items
+        /// </summary>
+        /// <param name="ivm">Item View Model</param>
+        /// <returns>Creates a new Item, persists it, and returns it</returns>
+        [HttpPost()]
+        public IActionResult Add([FromBody]ItemViewModel ivm)
+        {
+            if (ivm != null)
+            {
+                // Create a new Item with the client-sent json data
+                var item = TinyMapper.Map<Item>(ivm);
+                // override any property that could be wise to set from server-side only
+                item.CreatedDate = item.LastModifiedDate = DateTime.Now;
+
+                // TODO: replace the following with the current user's id when authentication is available.
+                item.UserId = DbContext.Users.FirstOrDefault(u => u.UserName == "Admin").Id;
+
+                // add the new item
+                DbContext.Items.Add(item);
+
+                // persist changes
+                DbContext.SaveChanges();
+
+                // return the new Item to the client
+                return new JsonResult(TinyMapper.Map<ItemViewModel>(item), DefaultJsonSettings);
+            }
+
+            // if passed a null ivm
+            return StatusCode(500);
+        }
+
+        /// <summary>
+        /// PUT: api/items/{id}
+        /// </summary>        
+        /// <returns>Updates an existing Item and return it accordingly.</returns>
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody]ItemViewModel ivm)
+        {
+            if (ivm != null)
+            {
+                var item = DbContext.Items.FirstOrDefault(i => i.Id == id);
+                if (item != null)
+                {
+                    // handle the update (on per-property basis)
+                    item.UserId = ivm.UserId;
+                    item.Description = ivm.Description;
+                    item.Flags = ivm.Flags;
+                    item.Notes = ivm.Notes;
+                    item.Text = ivm.Text;
+                    item.Title = ivm.Title;
+                    item.Type = ivm.Type;
+
+                    // Override any property that could be wise to set from server-side only
+                    item.LastModifiedDate = DateTime.Now;
+
+                    // Persist changes to the DB
+                    DbContext.SaveChanges();
+
+                    //return the updated Item to the client
+                    return new JsonResult(TinyMapper.Map<ItemViewModel>(item), DefaultJsonSettings);
+                }
+
+                // return an HTTP Status 404 (Not Found) if we couldn't find a suitable item.
+                return NotFound(new { Error = $"Item ID {id} has not been found." });
+            }
+            return NotFound(new { Error = "Item's view model cannot be null" });
+        }
+
+        /// <summary>
+        /// DELETE: api/items/{id}
+        /// </summary>
+        /// <returns>Deletes an Item, returning the HTTP staus 200 (OK) when done.</returns>
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var item = DbContext.Items.FirstOrDefault(x => x.Id == id);
+
+            if (item != null)
+            {
+                // Remove the item from the DbContext
+                DbContext.Items.Remove(item);
+
+                // Persist the changes to the DB
+                DbContext.SaveChanges();
+
+                // Return Http Status code of 200
+                return new OkResult();
+            }
+            //return 404 status code
+            return NotFound(new { Error = $"Couldn't find an item with ID {id}" });
+        }
+
+        #endregion CRUD Operations
 
         /// <summary>
         /// GET api/items/GetLatest
@@ -78,7 +173,7 @@ namespace OpenGameList.Controllers
         [HttpGet("GetLatest/{num}")]
         public IActionResult GetLatest(int num)
         {
-            if ( num > MaxNumberOfItems ) num = MaxNumberOfItems;
+            if (num > MaxNumberOfItems) num = MaxNumberOfItems;
             var items = DbContext.Items.OrderByDescending(i => i.CreatedDate).Take(num).ToArray();
             return new JsonResult(ToItemViewModelList(items), DefaultJsonSettings);
         }
@@ -91,7 +186,7 @@ namespace OpenGameList.Controllers
         [HttpGet("GetMostViewed/{num}")]
         public IActionResult GetMostViewed(int num)
         {
-            if ( num > MaxNumberOfItems) num = MaxNumberOfItems;
+            if (num > MaxNumberOfItems) num = MaxNumberOfItems;
             var mostViewed = DbContext.Items.OrderByDescending(x => x.ViewCount).Take(num).ToArray();
             return new JsonResult(ToItemViewModelList(mostViewed), DefaultJsonSettings);
         }
@@ -126,7 +221,7 @@ namespace OpenGameList.Controllers
         [HttpGet("GetRandom/{num}")]
         public IActionResult GetRandom(int num)
         {
-            if ( num > MaxNumberOfItems) num = MaxNumberOfItems;
+            if (num > MaxNumberOfItems) num = MaxNumberOfItems;
             var rnd = DbContext.Items.OrderBy(x => Guid.NewGuid()).Take(num).ToArray();
             return new JsonResult(ToItemViewModelList(rnd), DefaultJsonSettings);
         }
@@ -157,9 +252,9 @@ namespace OpenGameList.Controllers
         private List<ItemViewModel> GetSampleItems(int num = 999)
         {
             var lst = new List<ItemViewModel>();
-            var date = new DateTime(2015,12,31).AddDays(-num);
+            var date = new DateTime(2015, 12, 31).AddDays(-num);
 
-            for ( int id = 1 ; id <= num ; id++ )
+            for (int id = 1; id <= num; id++)
             {
                 lst.Add(new ItemViewModel()
                 {

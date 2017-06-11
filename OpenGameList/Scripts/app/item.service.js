@@ -72,6 +72,32 @@ System.register(["@angular/core", "@angular/http", "rxjs/Observable"], function 
                         .map(res => res.json())
                         .catch(this.handleError);
                 }
+                // calls the [POST] /api/items/ Web API method to add a new item.
+                add(item) {
+                    var url = this.baseUrl;
+                    return this.http.post(url, JSON.stringify(item), this.getRequestOptions())
+                        .map(response => response.json())
+                        .catch(this.handleError);
+                }
+                // calls the [PUT] /api/items/{id} Web API method to update an existing Item
+                update(item) {
+                    var url = this.baseUrl + item.Id;
+                    return this.http.put(url, JSON.stringify(item), this.getRequestOptions())
+                        .map(response => response.json())
+                        .catch(this.handleError);
+                }
+                //calls the [DELETE] /api/items/{id} Web API method to delete the item with the given id
+                delete(id) {
+                    var url = this.baseUrl + id;
+                    return this.http.delete(url)
+                        .catch(this.handleError);
+                }
+                // returns a viable RequestOptions object to handle Json requests
+                getRequestOptions() {
+                    return new http_1.RequestOptions({
+                        headers: new http_1.Headers({ "Content-Type": "application/json" })
+                    });
+                }
                 handleError(error) {
                     // output errors to the console.
                     console.log(error);
