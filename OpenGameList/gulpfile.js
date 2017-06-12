@@ -4,8 +4,7 @@ var gulp = require('gulp'),
     gp_concat = require('gulp-concat'),
     gp_sourcemaps = require("gulp-sourcemaps"),
     gp_typescript = require("gulp-typescript"),
-    gp_uglify = require("gulp-uglify"),
-    babel = require("gulp-babel");
+    gp_uglify = require("gulp-uglify");
 
 // Paths
 var srcPaths = {
@@ -35,8 +34,6 @@ gulp.task('app',['app_clean'], function () {
     return gulp.src(srcPaths.app)
         .pipe(gp_sourcemaps.init())
         .pipe(gp_typescript(require('./tsconfig.json').compilerOptions))
-
-        //.pipe(babel({ presets: ['es2015'] }))
 
         //.pipe(gp_uglify({ mangle: false }))
         

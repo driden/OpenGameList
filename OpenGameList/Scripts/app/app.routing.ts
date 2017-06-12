@@ -5,7 +5,8 @@ import { HomeComponent } from "./home.component";
 import { AboutComponent } from "./about.component";
 import { LoginComponent } from "./login.component";
 import { PageNotFoundComponent } from "./page-not-found.component";
-import { ItemDetailComponent } from "./item-detail.component";
+import { ItemDetailEditComponent } from "./item-detail-edit.component";
+import { ItemDetailViewComponent } from "./item-detail-view.component";
 
 const appRoutes: Routes = [
     {
@@ -25,8 +26,12 @@ const appRoutes: Routes = [
         component : LoginComponent
     },
     {
-        path: "item/:id",
-        component: ItemDetailComponent
+        path: "item/edit/:id",
+        component: ItemDetailEditComponent
+    },
+    {
+        path: "item/view/:id",
+        component: ItemDetailViewComponent
     },
     {
         path: '**',

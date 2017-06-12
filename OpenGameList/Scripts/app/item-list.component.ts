@@ -67,8 +67,7 @@ export class ItemListComponent implements OnInit {
 
     onSelect(item: Item) {
         this.selectedItem = item;
-        console.log("item with id " + this.selectedItem.Id + " has been clicked: loading ItemDetailComponent");
-
-        this.router.navigate(["item", this.selectedItem.Id]);
+        console.log("item with id " + this.selectedItem.Id + " has been clicked: loading item viewer");
+        this.router.navigate(["item/view", this.selectedItem.Id]);
     }
 }
