@@ -4,7 +4,8 @@ var gulp = require('gulp'),
     gp_concat = require('gulp-concat'),
     gp_sourcemaps = require("gulp-sourcemaps"),
     gp_typescript = require("gulp-typescript"),
-    gp_uglify = require("gulp-uglify");
+    gp_uglify = require("gulp-uglify"),
+    gp_less = require("gulp-less");
 
 // Paths
 var srcPaths = {
@@ -15,28 +16,32 @@ var srcPaths = {
         'node_modules/zone.js/dist/zone.js',
         'node_modules/reflect-metadata/Reflect.js',
         'node_modules/systemjs/dist/system.src.js',
-        'node_modules/typescript/lib/typescript.js'        
+        'node_modules/typescript/lib/typescript.js',
+        'node_modules/ng2-bootstrap/bundles/ngx-bootstrap.umd.min.js',
+        'node_modules/moment/moment.js'
     ],
     js_angular: ['node_modules/@angular/**'],
-    js_rxjs:['node_modules/rxjs/**']
+    js_rxjs: ['node_modules/rxjs/**'],
+    less: ['Scripts/Less/**/*.less']
 };
 
 var destPaths = {
     app: 'wwwroot/app/',
     js: 'wwwroot/js/',
+    css: 'wwwroot/css/',
     js_angular: 'wwwroot/js/@angular/',
     js_rxjs: 'wwwroot/js/rxjs/'
 };
 
 // Compile, minify and create sourcemaps all Typescript files and place them to 
 // wwwroot/app, together with their js.map files
-gulp.task('app',['app_clean'], function () {
+gulp.task('app', ['app_clean'], function () {
     return gulp.src(srcPaths.app)
         .pipe(gp_sourcemaps.init())
         .pipe(gp_typescript(require('./tsconfig.json').compilerOptions))
 
         //.pipe(gp_uglify({ mangle: false }))
-        
+
         .pipe(gp_sourcemaps.write('/'))
         .pipe(gulp.dest(destPaths.app));
 });
@@ -55,7 +60,7 @@ gulp.task('js', function () {
         .pipe(gulp.dest(destPaths.js_rxjs));
     return gulp.src(srcPaths.js)
         .pipe(gp_uglify({ mangle: false })) // Disable Uglify
-       // .pipe(gp_concat('all-js.min.js')) // Disable Concat
+        // .pipe(gp_concat('all-js.min.js')) // Disable Concat
         .pipe(gulp.dest(destPaths.js));
 });
 
@@ -65,13 +70,26 @@ gulp.task('js_clean', function () {
         .pipe(gp_clean({ force: true }));
 });
 
+// Process LESS Files and output the resulting css in wwwroot/css
+gulp.task('less', ['less_clean'], function () {
+    return gulp.src(srcPaths.less)
+        .pipe(gp_less())
+        .pipe(gulp.dest(destPaths.css));
+});
+
+//Clean wwwroot/css folder
+gulp.task('less_clean', function () {
+    return gulp.src(destPaths.css + "*.*", { read: false })
+        .pipe(gp_clean({ force: true }));
+});
+
 // Watch specified files and define what to do upon file changes
 gulp.task('watch', function () {
-    gulp.watch([srcPaths.app,srcPaths.js],['app','js']);
+    gulp.watch([srcPaths.app, srcPaths.js], ['app', 'js']);
 });
 
 // Global cleanup task
-gulp.task('cleanup', ['app_clean', 'js_clean']);
+gulp.task('cleanup', ['app_clean', 'js_clean','less_clean']);
 
 // Default task that launches all the other tasks
-gulp.task('default',['app','js','watch']);
+gulp.task('default', ['app', 'js','less', 'watch']);
