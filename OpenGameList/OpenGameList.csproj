@@ -38,6 +38,11 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="wwwroot\img\favicon.ico" />
+    <None Include="wwwroot\img\header-bg.png" />
+    <None Include="wwwroot\img\logo.svg" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="Scripts\app\login.component.js">
       <DependentUpon>login.component.ts</DependentUpon>
     </None>
