@@ -267,3 +267,4 @@ OpenGameList/Scripts/app/*.js
 OpenGameList/Scripts/app/*.map
 OpenGameList/node_modules/*
 OpenGameList/wwwroot/css/*.css
+OpenGameList/wwwroot/css/style.css
