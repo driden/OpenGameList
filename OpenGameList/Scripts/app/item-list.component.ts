@@ -11,18 +11,9 @@ import { ItemService } from "./item.service";
 	                    [class.selected]="item===selectedItem"
 	                    (click)="onSelect(item)">
 	                    <div class="title">{{item.Title}}</div>
-                        <div class="description">{{{item.Description}}</div>
+                        <div class="description">{{item.Description}}</div>
                     </li>
-                </ul>`,                
-    styles: [`
-        // Some variables that will be used below
-@color-latest = #5a4d74;
-@color-most-viewed: #4d6552;
-$color-random: #703535;
-
-// Header styling
-h1.
-    `]
+                </ul>`
 })
 
 export class ItemListComponent implements OnInit {
