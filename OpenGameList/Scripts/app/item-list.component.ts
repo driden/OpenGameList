@@ -5,21 +5,23 @@ import { ItemService } from "./item.service";
 
 @Component({
     selector: "item-list",
-    template: `<h2>{{title}}</h2>
+    template: `<h3>{{title}}</h3>
                <ul class="items">
                     <li *ngFor="let item of items"
 	                    [class.selected]="item===selectedItem"
 	                    (click)="onSelect(item)">
-	                    <span>{{item.Title}}</span>
+	                    <div class="title">{{item.Title}}</div>
+                        <div class="description">{{{item.Description}}</div>
                     </li>
                 </ul>`,                
     styles: [`
-        ul.items li {
-            cursor: pointer;
-        }
-        ul.items li.selected {
-            background-color: #ccc;
-        }
+        // Some variables that will be used below
+@color-latest = #5a4d74;
+@color-most-viewed: #4d6552;
+$color-random: #703535;
+
+// Header styling
+h1.
     `]
 })
 
