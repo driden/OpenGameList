@@ -260,10 +260,10 @@ __pycache__/
 
 
 OpenGameList/typings/*
-OpenGameListWebApp/OpenGameList/node_modules/*
-
-OpenGameList/Scripts/app/*.js
-
 OpenGameList/wwwroot/app
 OpenGameList/wwwroot/js
+OpenGameList/wwwroot/css
 OpenGameList/Scripts/app/*.js
+OpenGameList/Scripts/app/*.map
+OpenGameList/node_modules/*
+OpenGameList/wwwroot/css/*.css
