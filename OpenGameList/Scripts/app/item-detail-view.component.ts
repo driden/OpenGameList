@@ -6,64 +6,29 @@ import { ItemService } from "./item.service";
 @Component({
     selector: "item-detail-view",
     template: `
-        <div *ngIf="item" class="item-container">
-            <div class="item-tab-menu">
-                <span (click)="onItemDetailEdit(item)">Edit</span>                
-                <span class="selected">View</span>
-            </div>
-            <div class="item-details">
-                <div class="mode">Display Mode</div>
-                <h2>{{item.Title}}</h2>
-                <p>{{item.Description}}</p>
-            </div>
-        </div>
-    `,
-    styles: [`
-        .item-container { width: 600px;}
-        
-        .item-tab-menu { margin-right: 30px;}
-        
-        .item-tab-menu span {
-            background-color: #ddd;
-            border: 1px solid #666;
-            border-bottom: 0;
-            cursor: pointer;
-            display: block;
-            float: right;
-            margin: 0 0 -1px 5px;
-            padding: 5px 10px 4px 10px;
-            text-align: center;
-            width: 60px;
-        }
-    
-        .item-tab-menu span.selected {
-            background-color: #eee;
-            cursor: auto;
-            font-weight: bold;
-            padding-bottom: 5px;
-        }
-
-        .item-details {
-            background-color: #eee;
-            border: 1px solid black;
-            clear: both;
-            margin: 0;
-            padding: 5px 10px;
-        }
-
-        .item-details * {
-            vertical-align: middle;
-        }
-
-        .item-details .mode {
-            font-size: 0.8em;
-            color: #777;
-        }
-
-        .item-details ul li {
-            padding: 5px 0;
-        }
-    `]
+        <div *ngIf="item">
+	    <h2>
+		    <a href="#" (click)="onBack()">&laquo; Back to Home</a>
+	    </h2>
+	    <div class="item-container">
+		    <ul class="nav nav-tabs">
+			    <li role="presentation"><a href="#" (click)="onItemDetailEdit(item)">Edit</a></li>
+			    <li role="presentation" class="active"><a href="#">View</a></li>
+		    </ul>
+		    <div class="panel panel-default">
+			    <div class="panel-body">
+				    <div class="item-image-panel">
+					    <img src="/img/item-image-sample.png" alt="{{item.Title}}"/>
+					    <div class="caption">Sample image with caption.</div>
+				    </div>
+				    <h3>{{item.Title}}</h3>
+				    <p>{{item.Description}}</p>
+				    <p>{{item.Text}}</p>
+			    </div>
+		    </div>
+	    </div>
+    </div>
+    `
 })
 
 export class ItemDetailViewComponent {
@@ -88,6 +53,9 @@ export class ItemDetailViewComponent {
     }
 
     onItemDetailEdit(item: Item) {
-        this.router.navigate(["item/edit",item.Id]);
+        this.router.navigate(["item/edit", item.Id]);
+        return false;
     }
+
+    onBack() { this.router.navigate([""]);}
 }

@@ -85,7 +85,7 @@ gulp.task('less_clean', function () {
 
 // Watch specified files and define what to do upon file changes
 gulp.task('watch', function () {
-    gulp.watch([srcPaths.app, srcPaths.js], ['app', 'js']);
+    gulp.watch([srcPaths.app, srcPaths.js, srcPaths.less], ['app', 'js', 'less']);
 });
 
 // Global cleanup task

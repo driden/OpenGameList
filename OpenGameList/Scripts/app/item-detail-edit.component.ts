@@ -6,99 +6,53 @@ import { Router, ActivatedRoute } from "@angular/router";
 @Component({
     selector: "item-detail-edit",
     template: `
-            <div *ngIf="item" class="item-container">
-	            <div class="item-tab-menu">
-		            <span class="selected">Edit</span>
-		            <span *ngIf="item.Id != 0" (click)="onItemDetailView(item)">View</span>
-	            </div>
-	            <div class="item-details">
-		            <div class="mode">Edit Mode</div>
-		            <h2>{{item.Title}}</h2>
-		            <ul>
-			            <li>
-				            <label>Title:</label>
-				            <input [(ngModel)]="item.Title" placeholder ="Insert the title..."/>
-			            </li>
-			            <li>
-				            <label>Description:</label>
-				            <textarea [(ngModel)]="item.Description" placeholder ="Insert a suitable description..."></textarea>
-			            </li>
-		            </ul>
-		            <div *ngIf="item.Id == 0" class="commands insert">
-			            <input type="button" value="Save" (click)="onInsert(item)"/>
-			            <input type="button" value="Cancel" (click)="onBack()"/>
-		            </div>
-		            <div *ngIf="item.Id != 0" class="commands update">
-			            <input type="button" value="Update" (click)="onUpdate(item)"/>
-			            <input type="button" value="Delete" (click)="onDelete(item)"/>
-			            <input type="button" value="Back" (click)="onBack()"/>
-			            <input type="button" value="Cancel" (click)="onItemDetailView(item)"/>
-		            </div>
-	            </div>
-            </div>
-    `,
-    styles: [`
-        .item-container { width: 600px;}
-
-        .item-tab-menu {margin-right: 30px;}
-
-        .item-tab-menu span {
-	        background-color: #ddd;
-	        border: 1px solid #666;
-	        border-bottom: 0;
-	        cursor: pointer;
-	        display: block;
-	        float: right;
-	        margin: 0 0 -1px 5px;
-	        padding: 5px 10px 4px 10px;
-	        text-align: center;
-	        width: 60px;
-        }
-
-        .item-tab-menu span.selected {
-	        background-color: #eee;
-	        cursor: auto;
-	        font-weight: bold;
-	        padding-bottom: 5px;
-        }
-
-        .item-details {
-	        background-color: #eee;
-	        border: 1px solid black;
-	        clear: both;
-	        margin: 0;
-	        padding: 5px 10px;
-        }
-
-        .item-details * {
-	        vertical-align: middle;
-        }
-
-        .item-details .mode {
-	        font-size: 0.8em;
-	        color: #777;
-        }
-
-        .item-details ul li {
-	        padding: 5px 0;
-        }
-
-        .item-details input[type="text"] {
-	        display: block;
-	        width: 100%;
-        }
-
-        .item-details textarea {
-	        display: block;
-	        width: 100%;
-	        height: 60px;
-        }
-
-        .commands {
-	        text-align: right;
-	        margin: 10px 20px 10px 10px;
-        }
-    `]
+<div *ngIf="item">
+	<h2><a href="#" (click)="onBack()">&laquo; Back to Home</a></h2>
+	<div class="item-container">
+		<ul class="nav nav-tabs">
+			<li role="presentation" class="active">
+				<a href="#">Edit</a>
+			</li>
+			<li role="presentation" *ngIf="item.Id != 0" >
+				<a href="#" (click)="onItemDetailView(item)">View</a>
+			</li>
+		</ul>
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<form class="item-detail-edit">
+					<h3>{{item.Title}}</h3>
+					<span class="empty-field" [hidden]="dTitle.valid">Empty Title</span>
+					<div class="form-group has-feedback" [ngClass]="{'has-success': dTitle.valid, 'has-error': !dTitle.valid}">
+						<label for="input-title">Title</label>
+						<input id="input-title" name="input-title" type="text" class="form-control" [(ngModel)]="item.Title" placeholder="Insert the title..." required #dTitle="ngModel" />
+						<span class="glyphicon form-control-feedback" aria-hidden="true" [ngClass]="{'glyphicon-ok': dTitle.valid, 'glyphicon-remove': !dTitle.valid}"></span>
+						<div [hidden]="dTitle.valid" class="alert alert-danger">
+							You need to enter a valid Title.
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="input-description">Description</label>
+						<textarea id="input-description" name="input-description" class="form-control" [(ngModel)]="item.Description" placeholder="Insert a suitable description..." required></textarea>
+					</div>
+					<div class="form-group">
+						<label for="input-text">Text</label>
+						<textarea id="input-text" name="input-text" class="form-control" [(ngModel)]="item.Text" placeholder="Insert a suitable description..."></textarea>
+					</div>
+					<div *ngIf="item.Id == 0" class="commands insert">
+						<input type="button" class="btn btn-primary" value="Save" (click)="onInsert(item)"/>
+						<input type="button" class="btn btn-default" value="Cancel" (click)="onBack()"/>
+					</div>
+					<div *ngIf="item.Id != 0" class="commands update">
+						<input type="button" class="btn btn-primary" value="Update" (click)="onUpdate(item)"/>
+						<input type="button" class="btn btn-danger" value="Delete" (click)="onDelete(item)"/>
+						<input type="button" class="btn btn-default" value="Cancel" (click)="onItemDetailView(item)"/>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+    `
 })
 
 export class ItemDetailEditComponent {
@@ -112,8 +66,6 @@ export class ItemDetailEditComponent {
     ngOnInit() {
         
         var id = +this.activatedRoute.snapshot.params["id"];
-
-        console.log("Id de la lista " + id);
 
         if (id) {
             this.itemService.get(id).subscribe(i => this.item = i);

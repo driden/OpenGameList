@@ -126,3 +126,91 @@ item-list {
         }
     }
 }
+
+// Item Detail View & Edit components styling
+@color-panel: #f9f9f9;
+
+.item-container {
+    margin: 0 20px;
+
+    .nav.nav-tabs {
+        padding-right: 20px;
+
+        li {
+            &.active a {
+                font-weight: bold;
+                background-color: @color-panel;
+            }
+
+            float: right;
+        }
+    }
+
+    .panel.panel-default {
+        background-color: @color-panel;
+        border-top-width: 0;
+
+        .item-image-panel {
+            width: 170px;
+            min-height: 170px;
+            float: right;
+            padding: 10px;
+            background-color: #f2f2f2;
+            border: 1px solid #cccccc;
+
+            img {
+                width: 150px;
+                height: 150px;
+                border: 1px solid #e6e6e6;
+            }
+
+            .caption {
+                margin-top: 5px;
+                text-align: center;
+                font-size: 0.8em;
+            }
+        }
+
+        h3 {
+            margin: 10px 0 20px 0;
+            font-weight: bold;
+        }
+    }
+    // Form styling for item-detail-edit component
+    form.item-detail-edit {
+        .empty-field {
+            color: #f04124;
+            font-weight:normal;
+            font-style:italic;
+        }
+
+        .form-group {
+            label {
+                font-size: 14px;
+                font-weight: bold;
+                display: block;
+                background-color: #eaeaea;
+                line-height: 1.4em;
+                padding: 5px 10px;
+            }
+
+            textarea {
+                &#input-description {
+                    height: 80px;
+                }
+
+                &#input-text {
+                    height: 150px;
+                }
+            }
+        }
+
+        .commands {
+            text-align: right;
+
+            input[type="button"] {
+                margin-left: 5px;
+            }
+        }        
+    }
+}
