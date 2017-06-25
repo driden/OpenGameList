@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using OpenGameList.Data.Comments;
 using OpenGameList.Data.Items;
@@ -14,14 +16,18 @@ namespace OpenGameList.Data
         #region Private Members
 
         private ApplicationDbContext DbContext;
+        private RoleManager<IdentityRole> RoleManager;
+        private UserManager<ApplicationUser> UserManager;
 
         #endregion Private Members
 
         #region Constructor
 
-        public DbSeeder(ApplicationDbContext dbContext)
+        public DbSeeder(ApplicationDbContext dbContext, RoleManager<IdentityRole> RoleManager, UserManager<ApplicationUser> UserManager)
         {
             DbContext = dbContext;
+            this.RoleManager = RoleManager;
+            this.UserManager = UserManager;
         }
 
         #endregion Constructor
@@ -35,7 +41,7 @@ namespace OpenGameList.Data
 
             //Create Default users
             if (await DbContext.Users.CountAsync() == 0)
-                CreateUsers();
+              await CreateUsersAsync();
 
             //Create default items (if there are none) and comments
             if (await DbContext.Items.CountAsync() == 0)
@@ -45,11 +51,21 @@ namespace OpenGameList.Data
 
         #region Seed Methods
 
-        private void CreateUsers()
+        private async Task CreateUsersAsync()
         {
             //local variables
             DateTime createdDate = new DateTime(2016, 03, 01, 12, 30, 00);
             DateTime lastModifiedDate = DateTime.Now;
+
+            string role_Administrators = "Administrators";
+            string role_Registered = "Registered";
+
+            // Create roles (if they don't exist yet)
+            if (!await RoleManager.RoleExistsAsync(role_Administrators))
+                await RoleManager.CreateAsync(new IdentityRole(role_Administrators));
+
+            if (!await RoleManager.RoleExistsAsync(role_Registered))
+                await RoleManager.CreateAsync(new IdentityRole(role_Registered));
 
             //Create the "Admin" ApplicationUser account(if it doesn't exist already)
             var admin = new ApplicationUser()
@@ -61,8 +77,8 @@ namespace OpenGameList.Data
                 LastModifiedDate = lastModifiedDate
             };
 
-            //Insert Admin into the db
-            DbContext.Users.Add(admin);
+            //Insert Admin into the db and assign "Administrator" role to him
+            await AddUserWithRoleAsync(role_Administrators, "Pass4Admin", admin);
 
 #if DEBUG
             //Create some sample registered user accounts(if they don't exist already)
@@ -94,9 +110,25 @@ namespace OpenGameList.Data
             };
 
             //Insert sample accounts into the db
-            DbContext.Users.AddRange(ryan, solice, vodan);
+            await AddUserWithRoleAsync(role_Registered, "Pass4Ryan", ryan );
+            await AddUserWithRoleAsync(role_Registered, "Pass4Solice", solice);
+            await AddUserWithRoleAsync(role_Registered, "Pass4Vodan", vodan);
+
 #endif
-            DbContext.SaveChanges();
+            await DbContext.SaveChangesAsync();
+        }
+
+        private async Task AddUserWithRoleAsync(string role, string password, ApplicationUser user)
+        {
+            if (await UserManager.FindByIdAsync(user.Id) == null)
+            {
+                await UserManager.CreateAsync(user, password);
+                await UserManager.AddToRoleAsync(user, role);
+
+                //Remove Lockout and E-mail confirmation
+                user.EmailConfirmed = true;
+                user.LockoutEnabled = false;
+            }
         }
 
         private void CreateItems()

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Nelibur.ObjectMapper;
 using OpenGameList.Data;
 using OpenGameList.Data.Items;
+using OpenGameList.Data.Users;
 using OpenGameList.ViewModels;
 using System;
 
@@ -35,6 +37,17 @@ namespace OpenGameList
 
             //Add EF's Identity Support
             services.AddEntityFramework();
+
+            // Add Identity Services & Stores
+            services.AddIdentity<ApplicationUser, IdentityRole>(config =>
+            {
+                config.User.RequireUniqueEmail = true;
+                config.Password.RequireNonAlphanumeric = false;
+                config.Cookies.ApplicationCookie.AutomaticChallenge = false;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+
             //Add ApplicationDbContext
             services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]));
 

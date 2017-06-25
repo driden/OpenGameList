@@ -1,14 +1,13 @@
-﻿using OpenGameList.Data.Comments;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using OpenGameList.Data.Comments;
 using OpenGameList.Data.Items;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace OpenGameList.Data.Users
 {
-    public class ApplicationUser
+    public class ApplicationUser : IdentityUser
     {
         public ApplicationUser()
         {
@@ -16,17 +15,18 @@ namespace OpenGameList.Data.Users
         }
 
         #region Properties
+        // IdentityUser ya me da estas props
+        
+        //[Key]
+        //[Required]
+        //public string Id { get; set; }
 
-        [Key]
-        [Required]
-        public string Id { get; set; }
+        //[Required]
+        //[MaxLength(128)]
+        //public string UserName { get; set; }
 
-        [Required]
-        [MaxLength(128)]
-        public string UserName { get; set; }
-
-        [Required]
-        public string Email { get; set; }
+        //[Required]
+        //public string Email { get; set; }
 
         public string DisplayName { get; set; }
 
