@@ -77,9 +77,28 @@ namespace OpenGameList.Classes
             }
         }
 
-        private Task CreateToken(HttpContext httpContext)
+        private async Task CreateToken(HttpContext httpContext)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // retrieve the releveant FORM data
+                string username = httpContext.Request.Form["username"];
+                string password = httpContext.Request.Form["password"];
+
+                // Check if there's already an user with that username
+                var user = await UserManager.FindByNameAsync(username);
+
+                // fallback to support e-mail address instead of username
+                if (user == null && username.Contains("@"))
+                    user = await UserManager.FindByEmailAsync(username);
+
+                var success = user != null && await UserManager.CheckPasswordAsync(user, password);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         #endregion
