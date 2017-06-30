@@ -7,11 +7,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Nelibur.ObjectMapper;
+using OpenGameList.Classes;
 using OpenGameList.Data;
 using OpenGameList.Data.Items;
 using OpenGameList.Data.Users;
 using OpenGameList.ViewModels;
 using System;
+using Microsoft.IdentityModel.Tokens;
 
 namespace OpenGameList
 {
@@ -71,7 +73,26 @@ namespace OpenGameList
                     context.Context.Response.Headers["Pragma"] = Configuration["StaticFiles:Headers:Pragma"];
                     context.Context.Response.Headers["Expires"] = Configuration["StaticFiles:Headers:Expires"];
                 }
-            });            
+            });
+
+            // Add a custom Jwt Provider to generate Tokens
+            app.UseJwtProvider();
+            // Add the Jwt Bearer Header Authentication to validate Tokens
+            app.UseJwtBearerAuthentication(new JwtBearerOptions() {
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true,
+                RequireHttpsMetadata = false,
+                TokenValidationParameters = new TokenValidationParameters()
+                {
+                    IssuerSigningKey = JwtProvider.SecurityKey,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = JwtProvider.Issuer,
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                }
+            });
+
+            // Add MVC to the pipeline
             app.UseMvc();
 
             //Tiny Maper binding config

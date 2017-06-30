@@ -2,9 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using OpenGameList.Data;
 using OpenGameList.Data.Users;
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -76,6 +79,9 @@ namespace OpenGameList.Classes
                 return httpContext.Response.WriteAsync("Bad request.");
             }
         }
+        #endregion
+
+        #region Private Methods
 
         private async Task CreateToken(HttpContext httpContext)
         {
@@ -93,15 +99,55 @@ namespace OpenGameList.Classes
                     user = await UserManager.FindByEmailAsync(username);
 
                 var success = user != null && await UserManager.CheckPasswordAsync(user, password);
+
+                if (success)
+                {
+                    DateTime now = DateTime.UtcNow;
+
+                    // Add registered claims for JWT (RFC7519)
+                    var claims = new[] {
+                        new Claim(JwtRegisteredClaimNames.Iss, Issuer),
+                        new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim(JwtRegisteredClaimNames.Iat,
+                                    new DateTimeOffset(now).ToUnixTimeSeconds().ToString(),
+                                    ClaimValueTypes.Integer64)
+                    };
+
+                    // Create a JWT and write it to the screen
+                    var token = new JwtSecurityToken(
+                        claims: claims,
+                        notBefore: now,
+                        signingCredentials: SigningCredentials);
+
+                    var encodedToken = new JwtSecurityTokenHandler().WriteToken(token);
+
+                    // Build the json response
+                    var jwt = new
+                    {
+                        acces_token = encodedToken,
+                        expiration = (int)TokenExpiration.TotalSeconds
+                    };
+
+                    // return token
+                    httpContext.Response.ContentType = "application/json";
+                    await httpContext.Response.WriteAsync(JsonConvert.SerializeObject(jwt));
+
+                    return;
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
                 throw;
             }
+
+            httpContext.Response.StatusCode = 400;
+            await httpContext.Response.WriteAsync("Invalid username or password");
         }
 
-        #endregion
+        #endregion        
+
     }
 
     // Extension method used to add the middleware to the HTTP request pipeline.
