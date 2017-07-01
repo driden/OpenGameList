@@ -7,6 +7,8 @@ using OpenGameList.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace OpenGameList.Controllers
 {
@@ -65,6 +67,7 @@ namespace OpenGameList.Controllers
         /// <param name="ivm">Item View Model</param>
         /// <returns>Creates a new Item, persists it, and returns it</returns>
         [HttpPost()]
+        [Authorize]
         public IActionResult Add([FromBody]ItemViewModel ivm)
         {
             if (ivm != null)
@@ -74,8 +77,7 @@ namespace OpenGameList.Controllers
                 // override any property that could be wise to set from server-side only
                 item.CreatedDate = item.LastModifiedDate = DateTime.Now;
 
-                // TODO: replace the following with the current user's id when authentication is available.
-                item.UserId = DbContext.Users.FirstOrDefault(u => u.UserName == "Admin").Id;
+                item.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
                 // add the new item
                 DbContext.Items.Add(item);
@@ -96,6 +98,7 @@ namespace OpenGameList.Controllers
         /// </summary>        
         /// <returns>Updates an existing Item and return it accordingly.</returns>
         [HttpPut("{id}")]
+        [Authorize]
         public IActionResult Update(int id, [FromBody]ItemViewModel ivm)
         {
             if (ivm != null)
@@ -133,6 +136,7 @@ namespace OpenGameList.Controllers
         /// </summary>
         /// <returns>Deletes an Item, returning the HTTP staus 200 (OK) when done.</returns>
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete(int id)
         {
             var item = DbContext.Items.FirstOrDefault(x => x.Id == id);

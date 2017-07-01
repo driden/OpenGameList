@@ -1,6 +1,7 @@
 ﻿import { Component } from "@angular/core";
 import { FormBuilder, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
+import { AuthService } from "./auth.service"
 
 @Component({
     selector: "login",
@@ -24,11 +25,19 @@ import { Router } from "@angular/router";
                 `
 })
 
-export class LoginComponent{
+export class LoginComponent {
     title = "Login";
     loginForm = null;
+    loginError = false;
 
-    constructor(private fb: FormBuilder) {
+    constructor(
+        private fb: FormBuilder,
+        private router: Router,
+        private authService: AuthService
+    ) {
+        if (this.authService.isLoggedIn()) {
+            this.router.navigate([""])
+        }
         this.loginForm = fb.group({
             username: ["", Validators.required],
             password: ["", Validators.required]
@@ -36,7 +45,21 @@ export class LoginComponent{
     }
 
     performLogin(e) {
-        e.preventDefault();
-        alert(JSON.stringify(this.loginForm.value));
+        e.preventDefault()
+        const username = this.loginForm.value.username
+        const password = this.loginForm.value.password
+
+        this.authService.login(username, password)
+            .subscribe((data) => {
+                // login successful
+                this.loginError = false;
+                const auth = this.authService.getAuth()
+                alert("Our token is: " + auth.access_token)
+                this.router.navigate([""])
+            }, (err) => {
+                console.log(err)
+                //login failure
+                this.loginError = true
+            });
     }
 }

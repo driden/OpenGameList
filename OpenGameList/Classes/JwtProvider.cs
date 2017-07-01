@@ -118,14 +118,15 @@ namespace OpenGameList.Classes
                     var token = new JwtSecurityToken(
                         claims: claims,
                         notBefore: now,
-                        signingCredentials: SigningCredentials);
+                        signingCredentials: SigningCredentials,
+                        expires: now.Add(TokenExpiration));
 
                     var encodedToken = new JwtSecurityTokenHandler().WriteToken(token);
 
                     // Build the json response
                     var jwt = new
                     {
-                        acces_token = encodedToken,
+                        access_token = encodedToken,
                         expiration = (int)TokenExpiration.TotalSeconds
                     };
 
