@@ -2,11 +2,15 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Configuration;
 using OpenGameList.Data.Comments;
 using OpenGameList.Data.Items;
 using OpenGameList.Data.Users;
+using OpenIddict.Core;
+using OpenIddict.Models;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenGameList.Data
@@ -18,16 +22,24 @@ namespace OpenGameList.Data
         private ApplicationDbContext DbContext;
         private RoleManager<IdentityRole> RoleManager;
         private UserManager<ApplicationUser> UserManager;
+        private IConfiguration Configuration;
+        private OpenIddictApplicationManager<OpenIddictApplication> OpenIddictManager;
 
         #endregion Private Members
 
         #region Constructor
 
-        public DbSeeder(ApplicationDbContext dbContext, RoleManager<IdentityRole> RoleManager, UserManager<ApplicationUser> UserManager)
+        public DbSeeder(ApplicationDbContext dbContext, 
+            RoleManager<IdentityRole> RoleManager, 
+            UserManager<ApplicationUser> UserManager, 
+            IConfiguration Configuration, 
+            OpenIddictApplicationManager<OpenIddictApplication> OpenIddictManager)
         {
             DbContext = dbContext;
             this.RoleManager = RoleManager;
             this.UserManager = UserManager;
+            this.Configuration = Configuration;
+            this.OpenIddictManager = OpenIddictManager;
         }
 
         #endregion Constructor
@@ -39,6 +51,11 @@ namespace OpenGameList.Data
             //Create the db if it doesn't exist
             DbContext.Database.EnsureCreated();
 
+            if ((await OpenIddictManager.FindByClientIdAsync(Configuration["Authentication:OpenIddict:ClientId"], new CancellationToken())) == null)
+            {
+                CreateApplication().GetAwaiter().GetResult();
+            }
+
             //Create Default users
             if (await DbContext.Users.CountAsync() == 0)
               await CreateUsersAsync();
@@ -48,6 +65,26 @@ namespace OpenGameList.Data
                 CreateItems();
         }
         #endregion Public Methods
+
+        #region Private Methods
+
+        private async Task CreateApplication()
+        {
+            await OpenIddictManager.CreateAsync(new OpenIddictApplication
+            {
+                Id = Configuration["Authentication:OpenIddict:ApplicationId"],
+                DisplayName = Configuration["Authentication:OpenIddict:DisplayName"],
+                RedirectUri = Configuration["Authentication:OpenIddict:Authority"] + Configuration["Authentication:OpenIddict:TokenEndPoint"],
+                LogoutRedirectUri = Configuration["Authentication:OpenIddict:Authority"],
+                ClientId = Configuration["Authentication:OpenIddict:ClientId"],
+                // ClientSecret = Crypto.HashPassword(Configuration["Authentication:OpenIddict:ClientSecret"]),
+                Type = OpenIddictConstants.ClientTypes.Public
+            }, new CancellationToken());
+            //This is the new way of adding a client secret, although it won't work if the application is marked as public.
+            //}, Configuration["Authentication:OpenIddict:ClientSecret"], new CancellationToken());
+        }   
+
+        #endregion
 
         #region Seed Methods
 

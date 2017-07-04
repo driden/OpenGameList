@@ -14,6 +14,8 @@ using OpenGameList.Data.Users;
 using OpenGameList.ViewModels;
 using System;
 using Microsoft.IdentityModel.Tokens;
+using OpenIddict.Core;
+using OpenIddict.Models;
 
 namespace OpenGameList
 {
@@ -34,6 +36,9 @@ namespace OpenGameList
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Create a reference to the Configuration object to do DI
+            services.AddSingleton<IConfiguration>(x => Configuration);
+
             // Add framework services.
             services.AddMvc();
 
@@ -51,7 +56,34 @@ namespace OpenGameList
             .AddDefaultTokenProviders();
 
             //Add ApplicationDbContext
-            services.AddDbContext<ApplicationDbContext>(o => o.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]));
+            services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]);
+                options.UseOpenIddict();
+            });
+
+            // Register the OpenIddict services, including the default Entity Framework stores.
+            services.AddOpenIddict(options => {
+                options.AddEntityFrameworkCoreStores<ApplicationDbContext>()
+                // Use Json Web Tokens (JWT)
+                .UseJsonWebTokens()
+                // Set a custom token endpoint (default is /connect/token)
+                .EnableTokenEndpoint(Configuration["Authentication:OpenIddict:TokenEndPoint"])
+                // Set a custom auth endpoint (default is /connect/authorize)
+                .EnableAuthorizationEndpoint(Configuration["Authentication:OpenIddict:AuthorizationEndPoint"])
+                // Allow client applications to use the grant_type=password flow.
+                .AllowPasswordFlow()
+                // Enable support for both authorization & implicit flows
+                .AllowAuthorizationCodeFlow()
+                .AllowImplicitFlow()
+                // Allow the client to refresh tokens.
+                .AllowRefreshTokenFlow()
+                // Disable the HTTPS requirement (not recommended in production)
+                .DisableHttpsRequirement()
+                // Register a new ephemeral key for development.
+                // We will register a X.509 certificate in production.
+                .AddEphemeralSigningKey();
+            });
 
             // Add ApplicationDbContext's DbSeeder
             services.AddSingleton<DbSeeder>();
@@ -76,9 +108,47 @@ namespace OpenGameList
             });
 
             // Add a custom Jwt Provider to generate Tokens
-            app.UseJwtProvider();
+            // app.UseJwtProvider();
+            
+
+            app.UseIdentity();
+
+            // Add external authentication middleware below. 
+            // To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
+          /*  app.UseFacebookAuthentication(new FacebookOptions()
+            {
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true,
+                AppId = Configuration["Authentication:Facebook:AppId"],
+                AppSecret = Configuration["Authentication:Facebook:AppSecret"],
+                CallbackPath = "/signin-facebook",
+                Scope = { "email" }
+            });
+
+            app.UseGoogleAuthentication(new GoogleOptions()
+            {
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true,
+                ClientId = Configuration["Authentication:Google:ClientId"],
+                ClientSecret = Configuration["Authentication:Google:ClientSecret"],
+                CallbackPath = "/signin-google",
+                Scope = { "email" }
+            });
+
+            app.UseTwitterAuthentication(new TwitterOptions()
+            {
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true,
+                ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"],
+                ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"],
+                CallbackPath = "/signin-twitter"
+            }); */
+
+            app.UseOpenIddict();
+
             // Add the Jwt Bearer Header Authentication to validate Tokens
-            app.UseJwtBearerAuthentication(new JwtBearerOptions() {
+            app.UseJwtBearerAuthentication(new JwtBearerOptions()
+            {
                 AutomaticAuthenticate = true,
                 AutomaticChallenge = true,
                 RequireHttpsMetadata = false,
