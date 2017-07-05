@@ -115,7 +115,7 @@ namespace OpenGameList
 
             // Add external authentication middleware below. 
             // To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
-          /*  app.UseFacebookAuthentication(new FacebookOptions()
+          app.UseFacebookAuthentication(new FacebookOptions()
             {
                 AutomaticAuthenticate = true,
                 AutomaticChallenge = true,
@@ -124,7 +124,7 @@ namespace OpenGameList
                 CallbackPath = "/signin-facebook",
                 Scope = { "email" }
             });
-
+            /*
             app.UseGoogleAuthentication(new GoogleOptions()
             {
                 AutomaticAuthenticate = true,

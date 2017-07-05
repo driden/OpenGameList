@@ -1,5 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Nelibur.ObjectMapper;
 using OpenGameList.Data;
 using OpenGameList.Data.Items;
@@ -7,26 +7,18 @@ using OpenGameList.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
 namespace OpenGameList.Controllers
 {
-    [Route("api/[controller]")]
-    public class ItemsController : Controller
+
+    public class ItemsController : BaseController
     {
-        #region Private fields
-
-        private ApplicationDbContext DbContext;
-
-        #endregion Private fields
-
         #region Constructor
 
         public ItemsController(ApplicationDbContext context)
         {
-            // DI
-            DbContext = context;
+            base.DbContext = context;
         }
 
         #endregion Constructor
@@ -272,16 +264,7 @@ namespace OpenGameList.Controllers
             }
             return lst;
         }
-
-        /// <summary>
-        /// Returns a suitable JsonSerializerSettings object that can be used to 
-        /// generate the JsonResult return value for this controller's methods
-        /// </summary>
-        private JsonSerializerSettings DefaultJsonSettings
-        {
-            get { return new JsonSerializerSettings() { Formatting = Formatting.Indented }; }
-        }
-
+        
         /// <summary>
         /// Returns the default number of items to retrieve when using parameterless
         /// overloads of the API methods retrieving item lists.
