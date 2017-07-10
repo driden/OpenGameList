@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using OpenGameList.Classes;
 using OpenGameList.Data;
 using OpenGameList.Data.Users;
-using OpenGameList.ViewModels;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -141,6 +134,17 @@ namespace OpenGameList.Controllers
                 return BadRequest(new { Error = ex.Message});
                 throw;
             }
+        }
+
+        // POST: /api/Accounts/Logout
+        [HttpPost("Logout")]
+        public IActionResult Logout()
+        {
+            if (HttpContext.User.Identity.IsAuthenticated)
+            {
+                SignInManager.SignOutAsync().Wait();
+            }
+            return Ok();
         }
         #endregion
 

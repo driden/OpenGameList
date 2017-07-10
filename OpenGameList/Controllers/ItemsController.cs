@@ -1,13 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Nelibur.ObjectMapper;
 using OpenGameList.Data;
 using OpenGameList.Data.Items;
+using OpenGameList.Data.Users;
 using OpenGameList.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace OpenGameList.Controllers
 {
@@ -16,10 +19,12 @@ namespace OpenGameList.Controllers
     {
         #region Constructor
 
-        public ItemsController(ApplicationDbContext context)
-        {
-            base.DbContext = context;
-        }
+        public ItemsController(
+            ApplicationDbContext context,
+            SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager)
+            : base(context, signInManager, userManager)
+        { }
 
         #endregion Constructor
 
@@ -60,7 +65,7 @@ namespace OpenGameList.Controllers
         /// <returns>Creates a new Item, persists it, and returns it</returns>
         [HttpPost()]
         [Authorize]
-        public IActionResult Add([FromBody]ItemViewModel ivm)
+        public async Task<IActionResult> Add([FromBody]ItemViewModel ivm)
         {
             if (ivm != null)
             {
@@ -69,7 +74,7 @@ namespace OpenGameList.Controllers
                 // override any property that could be wise to set from server-side only
                 item.CreatedDate = item.LastModifiedDate = DateTime.Now;
 
-                item.UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                item.UserId = await GetCurrentUserId();
 
                 // add the new item
                 DbContext.Items.Add(item);
@@ -264,7 +269,7 @@ namespace OpenGameList.Controllers
             }
             return lst;
         }
-        
+
         /// <summary>
         /// Returns the default number of items to retrieve when using parameterless
         /// overloads of the API methods retrieving item lists.

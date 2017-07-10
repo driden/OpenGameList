@@ -21,6 +21,9 @@ import { AuthService } from "./auth.service"
 		</div>
 		<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
 	</form>
+    <button class="btn btn-sm btn-default btn-block" type="submit" (click)="callExternalLogin('Facebook')">
+        Log in with Facebook
+    </button>
 </div>
                 `
 })
@@ -29,12 +32,12 @@ export class LoginComponent {
     title = "Login";
     loginForm = null;
     loginError = false;
+    externalProviderWindow = null;
 
     constructor(
         private fb: FormBuilder,
         private router: Router,
-        private authService: AuthService
-    ) {
+        private authService: AuthService) {
         if (this.authService.isLoggedIn()) {
             this.router.navigate([""])
         }
@@ -61,5 +64,22 @@ export class LoginComponent {
                 //login failure
                 this.loginError = true
             });
+    }
+
+    callExternalLogin(providerName: string) {
+        let url = "api/Accounts/ExternalLogin/" + providerName
+
+        // Minimalistic mobile devices support
+        let w = (screen.width >= 1050) ? 1050 : screen.width
+        let h = (screen.height >= 550) ? 550 : screen.height
+
+        let params = "toolbar=yes,scrollbars=yes,resizable=yes,width=" + w + "height=" + h
+
+        //close previously opened windows
+        if (this.externalProviderWindow) {
+            this.externalProviderWindow.close()
+        }
+
+        this.externalProviderWindow = window.open(url, "ExternalProvider", params, false)
     }
 }
