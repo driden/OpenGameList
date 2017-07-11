@@ -24,8 +24,13 @@ import { AuthService } from "./auth.service"
     <button class="btn btn-sm btn-default btn-block" type="submit" (click)="callExternalLogin('Facebook')">
         Log in with Facebook
     </button>
-</div>
-                `
+    <button class="btn btn-sm btn-default btn-block" type="submit" (click)="callExternalLogin('Google')">
+        Log in with Google
+    </button>
+    <button class="btn btn-sm btn-default btn-block" type="submit" (click)="callExternalLogin('Twitter')">
+        Log in with Twitter
+    </button>
+</div>`
 })
 
 export class LoginComponent {

@@ -124,7 +124,7 @@ namespace OpenGameList
                 CallbackPath = "/signin-facebook",
                 Scope = { "email" }
             });
-            /*
+            
             app.UseGoogleAuthentication(new GoogleOptions()
             {
                 AutomaticAuthenticate = true,
@@ -134,7 +134,7 @@ namespace OpenGameList
                 CallbackPath = "/signin-google",
                 Scope = { "email" }
             });
-
+            
             app.UseTwitterAuthentication(new TwitterOptions()
             {
                 AutomaticAuthenticate = true,
@@ -142,7 +142,7 @@ namespace OpenGameList
                 ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"],
                 ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"],
                 CallbackPath = "/signin-twitter"
-            }); */
+            }); 
 
             app.UseOpenIddict();
 

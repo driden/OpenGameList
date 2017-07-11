@@ -29,13 +29,21 @@ namespace OpenGameList.Controllers
         {
             switch (provider)
             {
-                case "facebook":
-                case "google":
-                case "twitter":
+                case "Facebook":
+                case "Google":
+                case "Twitter":
                     // Request a redirect to the external login priovider.
-                    var redirectUrl = Url.Action("ExternalLoginCallback", "Accounts", new { ReturnUrl = returnUrl });
+                    var redirectUrl = Url.Action("ExternalLoginCallback", new { ReturnUrl = returnUrl });
                     var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-                    return Challenge(properties, provider);
+                    try
+                    {
+                        var res = Challenge(properties, provider);
+                        return res;
+                    }
+                    catch(Exception e)
+                    {
+                        return null;
+                    }
                 default:
                     return BadRequest(new { Error = $"Provider {provider} is not supported" });
             }
