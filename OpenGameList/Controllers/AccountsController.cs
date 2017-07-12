@@ -22,7 +22,7 @@ namespace OpenGameList.Controllers
         #endregion
 
         #region External Authentication Providers
-        
+
         // GET: /api/Accounts/ExternalLogin
         [HttpGet("ExternalLogin/{provider}")]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
@@ -35,19 +35,12 @@ namespace OpenGameList.Controllers
                     // Request a redirect to the external login priovider.
                     var redirectUrl = Url.Action("ExternalLoginCallback", new { ReturnUrl = returnUrl });
                     var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-                    try
-                    {
-                        var res = Challenge(properties, provider);
-                        return res;
-                    }
-                    catch(Exception e)
-                    {
-                        return null;
-                    }
+                    return Challenge(properties, provider);
+
                 default:
                     return BadRequest(new { Error = $"Provider {provider} is not supported" });
             }
-        } 
+        }
 
         // GET: /api/Accounts/ExternalLoginCallBack
         [HttpGet("ExternalLoginCallBack")]
@@ -56,7 +49,7 @@ namespace OpenGameList.Controllers
             try
             {
                 // Check if the external Provider returned an error and act accordingly
-                if( remoteError != null)
+                if (remoteError != null)
                 {
                     throw new Exception(remoteError);
                 }
@@ -73,13 +66,13 @@ namespace OpenGameList.Controllers
                 // Check if this user already registered himself with this external provider before
                 var user = await UserManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
 
-                if(user == null)
+                if (user == null)
                 {
                     // If we reach this point, it means that this user never tried to log in
                     // using this external provider. However, it could have been used other providers
                     // and /or have a local account.
                     // We can find out if that's the case by looking for his e-mail address.
-                    
+
                     // Retrieve the 'emailaddress' claim
                     var emailKey = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
                     var email = info.Principal.FindFirst(emailKey).Value;
@@ -123,7 +116,8 @@ namespace OpenGameList.Controllers
                 }
 
                 // create the auth JSON object
-                var auth = new {
+                var auth = new
+                {
                     type = "External",
                     providerName = info.LoginProvider
                 };
@@ -133,13 +127,13 @@ namespace OpenGameList.Controllers
                 return Content(
                     @"<script type=""text/javascript"">
                     window.opener.externalProviderLogin(" +
-                    JsonConvert.SerializeObject(auth)+");"
-                    +"window.close(); </script>","text/html");
+                    JsonConvert.SerializeObject(auth) + ");"
+                    + "window.close(); </script>", "text/html");
             }
             catch (Exception ex)
             {
                 // return a http status 400 (Bad Request) to the client
-                return BadRequest(new { Error = ex.Message});
+                return BadRequest(new { Error = ex.Message });
                 throw;
             }
         }
