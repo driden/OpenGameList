@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using OpenGameList.Data;
 using OpenGameList.Data.Users;
+using System.Linq;
+using OpenGameList.ViewModels;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -27,16 +29,15 @@ namespace OpenGameList.Controllers
         [HttpGet("ExternalLogin/{provider}")]
         public IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
-            switch (provider)
+            switch (provider.ToLower())
             {
-                case "Facebook":
-                case "Google":
-                case "Twitter":
+                case "facebook":
+                case "google":
+                    // case "twitter":
                     // Request a redirect to the external login priovider.
                     var redirectUrl = Url.Action("ExternalLoginCallback", new { ReturnUrl = returnUrl });
                     var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
                     return Challenge(properties, provider);
-
                 default:
                     return BadRequest(new { Error = $"Provider {provider} is not supported" });
             }
@@ -150,5 +151,28 @@ namespace OpenGameList.Controllers
         }
         #endregion
 
+        #region RESTful Conventions
+
+        [HttpGet()]
+        public async Task<IActionResult> Get()
+        {
+            var id = await GetCurrentUserId();
+            var user = DbContext.Users.FirstOrDefault(x => id == x.Id);
+
+            if (user != null)
+                return new JsonResult(
+                    new UserViewModel
+                    {
+                        UserName = user.UserName,
+                        Email = user.Email,
+                        DisplayName = user.DisplayName
+                    }, DefaultJsonSettings);
+            else
+                return NotFound(new { Error = $"User ID {id} has not been found" });
+
+
+        }
+
+        #endregion
     }
 }
