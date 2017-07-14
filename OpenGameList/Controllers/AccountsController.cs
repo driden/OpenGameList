@@ -153,6 +153,10 @@ namespace OpenGameList.Controllers
 
         #region RESTful Conventions
 
+        /// <summary>
+        /// GET: api/accounts
+        /// </summary>
+        /// <returns>A Json-serialized object representing the current account.</returns>
         [HttpGet()]
         public async Task<IActionResult> Get()
         {
@@ -169,10 +173,68 @@ namespace OpenGameList.Controllers
                     }, DefaultJsonSettings);
             else
                 return NotFound(new { Error = $"User ID {id} has not been found" });
-
-
         }
 
+        /// <summary>
+        /// GET: api/accounts/{id}
+        /// ROUTING TYPE: attribute-based
+        /// </summary>
+        /// <returns>A Json-serialized object representing a single account.</returns>
+        [HttpGet("{id}")]
+        public IActionResult Get(string id)
+        {
+            return BadRequest(new { Error = "not implemented(yet)."});
+        }
+
+        public async Task<IActionResult> Add([FromBody] UserViewModel uvm)
+        {
+            if (uvm != null)
+            {
+                try
+                {
+                    // Check if the Username/Email already exists
+                    ApplicationUser user = await UserManager.FindByNameAsync(uvm.UserName);
+                    if (user != null) throw new Exception("UserName already exists.");
+                    user = await UserManager.FindByEmailAsync(uvm.Email);
+                    if (user != null) throw new Exception("E-mail already exists.");
+                    var now = DateTime.Now;
+
+                    // Create a new User with the client-sent json data
+                    user = new ApplicationUser
+                    {
+                        UserName = uvm.UserName,
+                        Email = uvm.Email,
+                        CreatedDate = now,
+                        LastModifiedDate = now
+                    };
+
+                    // Add the user to the db with a random password
+                    await UserManager.CreateAsync(user, uvm.Password);
+
+                    // Assigned the user to the 'Registered' role
+                    await UserManager.AddToRoleAsync(user, "Registered");
+
+                    // Remove lockout and E-mail confirmation
+                    user.EmailConfirmed = true;
+                    user.LockoutEnabled = false;
+
+                    // Persist changes to the DB
+                    DbContext.SaveChanges();
+
+                    // return the newly-created User to the client
+                    return new JsonResult(new UserViewModel {
+                        UserName = user.UserName,
+                        DisplayName = user.DisplayName,
+                        Email = user.Email
+                    }, DefaultJsonSettings);
+                }
+                catch (Exception ex)
+                {
+                    //return error
+                    return new JsonResult(new { error = ex.Message });
+                }
+            }
+        }
         #endregion
     }
 }
