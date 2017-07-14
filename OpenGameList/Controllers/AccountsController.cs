@@ -7,6 +7,7 @@ using OpenGameList.Data;
 using OpenGameList.Data.Users;
 using System.Linq;
 using OpenGameList.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -183,7 +184,7 @@ namespace OpenGameList.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
-            return BadRequest(new { Error = "not implemented(yet)."});
+            return BadRequest(new { Error = "not implemented(yet)." });
         }
 
         public async Task<IActionResult> Add([FromBody] UserViewModel uvm)
@@ -222,7 +223,8 @@ namespace OpenGameList.Controllers
                     DbContext.SaveChanges();
 
                     // return the newly-created User to the client
-                    return new JsonResult(new UserViewModel {
+                    return new JsonResult(new UserViewModel
+                    {
                         UserName = user.UserName,
                         DisplayName = user.DisplayName,
                         Email = user.Email
@@ -237,6 +239,83 @@ namespace OpenGameList.Controllers
 
             // Return a generic HTTP status 500 if the client payload is invalid
             return new StatusCodeResult(500);
+        }
+
+        /// <summary>
+        /// PUT: api/accounts/{id}
+        /// </summary>
+        /// <param name="uvm"></param>
+        /// <returns>Updates current User and return it accodingly.</returns>
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> Update([FromBody] UserViewModel uvm)
+        {
+            if (uvm != null)
+            {
+                try
+                {
+                    // Retrieve User
+                    var id = await GetCurrentUserId();
+                    ApplicationUser user = await UserManager.FindByIdAsync(id);
+                    if (user == null) throw new Exception("User not found.");
+
+                    // Check for current password
+                    if (await UserManager.CheckPasswordAsync(user, uvm.Password))
+                    {
+                        // Current password ok, perform changes (if any)
+                        bool hadChanges = false;
+
+                        if (user.Email != uvm.Email)
+                        {
+                            // Check if the Email already exists
+                            var user2 = await UserManager.FindByEmailAsync(uvm.Email);
+                            if (user2 != null && user.Id != user2.Id)
+                                throw new Exception("E-mail already exists");
+                            else
+                                await UserManager.SetEmailAsync(user, uvm.Email);
+                        }
+
+                        if (!string.IsNullOrEmpty(uvm.PasswordNew))
+                        {
+                            await UserManager.ChangePasswordAsync(user, uvm.Password, uvm.PasswordNew);
+                            hadChanges = true;
+                        }
+
+                        if (user.DisplayName != uvm.DisplayName)
+                        {
+                            user.DisplayName = uvm.DisplayName;
+                            hadChanges = true;
+                        }
+
+                        if (hadChanges)
+                        {
+                            // Persist changes to the db
+                            user.LastModifiedDate = DateTime.Now;
+                            DbContext.SaveChanges();
+                        }
+
+                        // Return the updated User to the client
+                        return new JsonResult(
+                            new UserViewModel
+                            {
+                                UserName = user.UserName,
+                                DisplayName = user.DisplayName,
+                                Email = user.Email
+                            },
+                            DefaultJsonSettings);
+                    }
+                    else throw new Exception("Old Password mismatch.");
+                }
+                catch (Exception e)
+                {
+                    //throw error
+                    return new JsonResult(new { error = e.Message });
+                }
+            }
+
+            // Return HTTP status 404 (Not Found) if we couldn't find a suitable item.
+            return NotFound(new { error = "Current user has not been found" });
+
         }
         #endregion
     }
