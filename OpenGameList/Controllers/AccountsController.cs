@@ -234,6 +234,9 @@ namespace OpenGameList.Controllers
                     return new JsonResult(new { error = ex.Message });
                 }
             }
+
+            // Return a generic HTTP status 500 if the client payload is invalid
+            return new StatusCodeResult(500);
         }
         #endregion
     }
