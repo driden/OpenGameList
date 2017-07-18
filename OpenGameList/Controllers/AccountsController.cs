@@ -1,13 +1,13 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using OpenGameList.Data;
 using OpenGameList.Data.Users;
-using System.Linq;
 using OpenGameList.ViewModels;
-using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -316,6 +316,29 @@ namespace OpenGameList.Controllers
             // Return HTTP status 404 (Not Found) if we couldn't find a suitable item.
             return NotFound(new { error = "Current user has not been found" });
 
+        }
+
+        /// <summary>
+        /// DELETE: api/accounts
+        /// </summary>
+        /// <returns>Deletes the current user, returning a HTTP 200 (ok) when done.</returns>
+        [HttpDelete()]
+        [Authorize]
+        public IActionResult Delete()
+        {
+            return BadRequest(new { error = "not implemented (yet)." });
+        }
+
+        /// <summary>
+        /// DELETE: api/accounts/{id}
+        /// </summary>
+        /// <param name="id">id of the user to delete</param>
+        /// <returns>Deletes an User, returning an HTTP 200 status code when done.</returns>
+        [HttpDelete("{id}")]
+        [Authorize]
+        public IActionResult Delete(string id)
+        {
+            return BadRequest(new { error = "not implemented (yet)." });
         }
         #endregion
     }

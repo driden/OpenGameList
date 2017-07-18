@@ -137,9 +137,8 @@ namespace OpenGameList.Classes
                     return;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
                 throw;
             }
 

@@ -92,4 +92,7 @@ gulp.task('watch', function () {
 gulp.task('cleanup', ['app_clean', 'js_clean','less_clean']);
 
 // Default task that launches all the other tasks
-gulp.task('default', ['app', 'js','less', 'watch']);
+gulp.task('default', ['app', 'js', 'less', 'watch']);
+
+// Default task that launches all the other tasks
+gulp.task('all', ['app', 'js', 'less']);

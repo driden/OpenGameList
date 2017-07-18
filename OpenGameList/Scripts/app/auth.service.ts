@@ -2,6 +2,7 @@
 import { Headers, Response, RequestOptions } from "@angular/http"
 import { Observable } from "rxjs/Observable"
 import { AuthHttp } from "./auth.http"
+import { User } from "./user"
 
 @Injectable()
 export class AuthService {
@@ -84,5 +85,25 @@ export class AuthService {
     // Returns true if the user is logged in, False otherwise.
     isLoggedIn(): boolean {
         return localStorage.getItem(this.authKey) !== null
+    }
+
+    // Get user
+    get() {
+        return this.http.get("api/Accounts")
+        .map(r => r.json())
+    }
+
+    // Add User
+    add(user: User) {
+        return this.http.post(
+            "api/Accounts",
+            JSON.stringify(user),
+            new RequestOptions({
+                headers: new Headers({
+                    "Content-type": "application/json"
+                })
+            })
+        )
+        .map(response => response.json())
     }
 }
