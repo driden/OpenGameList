@@ -1,21 +1,23 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using AspNet.Security.OpenIdConnect.Primitives;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Nelibur.ObjectMapper;
 using OpenGameList.Classes;
 using OpenGameList.Data;
 using OpenGameList.Data.Items;
 using OpenGameList.Data.Users;
 using OpenGameList.ViewModels;
-using System;
-using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Core;
 using OpenIddict.Models;
+using System;
 
 namespace OpenGameList
 {
@@ -55,6 +57,16 @@ namespace OpenGameList
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
+            // Configure Identity to use the same JWT claims as OpenIddict instead
+            // of the legacy WS-Federation claims it uses by default (ClaimTypes),
+            // which saves you from doing the mapping in your authorization controller.
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.ClaimsIdentity.UserNameClaimType = OpenIdConnectConstants.Claims.Name;
+                options.ClaimsIdentity.UserIdClaimType = OpenIdConnectConstants.Claims.Subject;
+                options.ClaimsIdentity.RoleClaimType = OpenIdConnectConstants.Claims.Role;
+            });
+
             //Add ApplicationDbContext
             services.AddDbContext<ApplicationDbContext>(options =>
             {
@@ -87,6 +99,10 @@ namespace OpenGameList
 
             // Add ApplicationDbContext's DbSeeder
             services.AddSingleton<DbSeeder>();
+            services.AddSingleton<OpenIddictApplicationManager<OpenIddictApplication>>();
+            services.AddSingleton<SignInManager<ApplicationUser>>();
+            services.AddSingleton<UserManager<ApplicationUser>>();
+            services.AddOptions();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -108,7 +124,7 @@ namespace OpenGameList
             });
 
             // Add a custom Jwt Provider to generate Tokens
-            // app.UseJwtProvider();
+            app.UseJwtProvider();
             
 
             app.UseIdentity();
@@ -152,11 +168,12 @@ namespace OpenGameList
                 AutomaticAuthenticate = true,
                 AutomaticChallenge = true,
                 RequireHttpsMetadata = false,
+                Authority = Configuration["Authentication:OpenIddict:Authority"],
                 TokenValidationParameters = new TokenValidationParameters()
                 {
-                    IssuerSigningKey = JwtProvider.SecurityKey,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = JwtProvider.Issuer,
+                    //IssuerSigningKey = JwtProvider.SecurityKey,
+                    //ValidateIssuerSigningKey = true,
+                    //ValidIssuer = JwtProvider.Issuer,
                     ValidateIssuer = false,
                     ValidateAudience = false
                 }

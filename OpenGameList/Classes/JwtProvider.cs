@@ -38,7 +38,8 @@ namespace OpenGameList.Classes
 
         #region Constructor
 
-        public JwtProvider(RequestDelegate next,
+        public JwtProvider(
+            RequestDelegate next,
             ApplicationDbContext dbContext,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager)
@@ -146,8 +147,7 @@ namespace OpenGameList.Classes
             await httpContext.Response.WriteAsync("Invalid username or password");
         }
 
-        #endregion        
-
+        #endregion
     }
 
     // Extension method used to add the middleware to the HTTP request pipeline.

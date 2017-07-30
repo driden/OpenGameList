@@ -187,6 +187,12 @@ namespace OpenGameList.Controllers
             return BadRequest(new { Error = "not implemented(yet)." });
         }
 
+        /// <summary>
+        /// POST: api/accounts
+        /// </summary>
+        /// <param name="uvm">User View Model</param>
+        /// <returns>Creates a new User and returns it accordingly</returns>
+        [HttpPost()]
         public async Task<IActionResult> Add([FromBody] UserViewModel uvm)
         {
             if (uvm != null)
@@ -210,10 +216,10 @@ namespace OpenGameList.Controllers
                     };
 
                     // Add the user to the db with a random password
-                    await UserManager.CreateAsync(user, uvm.Password);
+                   var createdUser =  await UserManager.CreateAsync(user, uvm.Password);
 
                     // Assigned the user to the 'Registered' role
-                    await UserManager.AddToRoleAsync(user, "Registered");
+                    createdUser = await UserManager.AddToRoleAsync(user, "Registered");
 
                     // Remove lockout and E-mail confirmation
                     user.EmailConfirmed = true;
@@ -309,7 +315,7 @@ namespace OpenGameList.Controllers
                 catch (Exception e)
                 {
                     //throw error
-                    return new JsonResult(new { error = e.Message });
+                    return new JsonResult(new { error = e.Message + "\n"+ e.InnerException.Message });
                 }
             }
 

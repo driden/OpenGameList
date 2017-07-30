@@ -11,7 +11,7 @@ import { User } from "./user"
 	<form class="form-user" [formGroup]="userForm" (submit)="onSubmit()">
 		<h2 class="form-user-heading">{{title}}</h2>
 		<div class="form-group">
-			<input fromControlName="username" type="text" class ="form-control" placeholder="Choose a Username" autofocus/>
+			<input formControlName="username" type="text" class="form-control" placeholder="Choose a Username" autofocus/>
 			<span class="validator-label valid" *ngIf="this.userForm.controls.username.valid">
 				<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
 				valid!
@@ -24,10 +24,10 @@ import { User } from "./user"
 		<div class="form-group">
 			<input formControlName="email" type="text" class="form-control" placeholder="Type your e-mail address"/>
 			<span class="validator-label valid" *ngIf="this.userForm.controls.email.valid">
-				<span class="glyphicon-glyphicon-ok" aria-hidden="true"></span>
+				<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
 				valid!				
 			</span>
-			<span	class="validator-label invalid" *ngIf="!this.userForm.controls.email.valid && !this.userForm.controls.email.pristine">
+			<span class="validator-label invalid" *ngIf="!this.userForm.controls.email.valid && !this.userForm.controls.email.pristine">
 				<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
 				invalid
 			</span>
@@ -35,7 +35,7 @@ import { User } from "./user"
 		<div class="form-group">
 			<input formControlName="password" type="password" class="form-control" placeholder="Choose a Password"/>
 			<span class="validator-label valid" *ngIf="this.userForm.controls.password.valid && !this.userForm.controls.password.pristine">
-				<span class="glyphicon-glyphicon-ok" aria-hidden="true"></span>
+				<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
 				valid!
 			</span>
 			<span class="validator-label invalid" *ngIf="!this.userForm.controls.password.valid && !this.userForm.controls.password.pristine">
@@ -46,7 +46,7 @@ import { User } from "./user"
 		<div class="form-group">
 			<input formControlName="passwordConfirm" type="password" class="form-control" placeholder="Confirm your Password"/>
 			<span class="validator-label valid" *ngIf="this.userForm.controls.passwordConfirm.valid && !this.userForm.controls.password.pristine && !this.userForm.hasError('compareFailed')">
-				<span class="glyphicon-glyphicon-ok" aria-hidden="true"></span>
+				<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
 				valid!
 			</span>
 			<span class="validator-label invalid" *ngIf="(!this.userForm.controls.passwordConfirm.valid && !this.userForm.controls.passwordConfirm.pristine) || this.userForm.hasError('compareFailed')">
@@ -91,7 +91,8 @@ export class UserEditComponent {
 			]],
 			password: ["", [
 				Validators.required,
-				Validators.minLength(6)
+                Validators.minLength(6),
+                Validators.pattern("^(?=.*[a-z])(?=.*[A-Z]).+$")
 			]],
 			passwordConfirm: ["", [
 				Validators.required,
@@ -118,7 +119,7 @@ export class UserEditComponent {
 	onSubmit() {
 		this.authService.add(this.userForm.value)
 			.subscribe(data => {
-				if (data == null) {
+				if (data.error == null) {
 					// registration successful
 					this.erroMessage = null;
 					this.authService.login(
@@ -132,7 +133,7 @@ export class UserEditComponent {
 						},
 						err => {
 							console.log(err)
-							this.erroMessage = "Warning: Username or Password mismatch"
+                            this.erroMessage = "Warning: Username or Password mismatch"                            
 						})
 				}
 				else {
@@ -143,6 +144,8 @@ export class UserEditComponent {
 			error => {
 				// Server/Connection error
 				this.erroMessage = error
-			})
+            })
+        if (this.erroMessage)
+            console.log(this.erroMessage)
 	}
 }
