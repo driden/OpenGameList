@@ -26,6 +26,7 @@ import { AuthService} from "./auth.service"
 				<li *ngIf="!authService.isLoggedIn()" [class.active]="isActive(['login']) || isActive('register')"><a class="login" [routerLink]="['login']">Login / Register</a></li>                
 				<li *ngIf="authService.isLoggedIn()"><a class="logout" href="javascript:void(0)" (click)="logout()">Logout</a></li>
 				<li *ngIf="authService.isLoggedIn()" [class.active]="isActive(['item/edit',0])"><a class="add" [routerLink]="['item/edit',0]">Add New</a></li>
+                <li *ngIf="authService.isLoggedIn()" class="right" [class.active]="isActive(['account'])"><a [routerLink]="['account']">Edit Account</a></li>
 			</ul>
 		</div>
 	</div>

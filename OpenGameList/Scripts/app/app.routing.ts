@@ -31,6 +31,10 @@ const appRoutes: Routes = [
         component: UserEditComponent
     },
     {
+        path: "account",
+        component: UserEditComponent
+    },
+    {
         path: "item/edit/:id",
         component: ItemDetailEditComponent
     },

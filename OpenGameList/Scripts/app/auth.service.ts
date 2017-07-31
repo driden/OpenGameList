@@ -106,4 +106,14 @@ export class AuthService {
         )
         .map(response => response.json())
     }
+
+    update(user: User) {
+        return this.http.put(
+            "api/Accounts",
+            JSON.stringify(user),
+            new RequestOptions({
+                headers: new Headers({ "Content-type": "application/json"})
+            }))
+        .map(response => response.json())        
+    }
 }
